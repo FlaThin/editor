@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+
+  <style>
+    #canvas {
+      border: 1px solid black;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="canvas" width="400" height="400"></canvas>
+
+  <script>
+    // Arquivo canvas.js
+
+    // Caso de uso para manipulação de imagens no canvas
+    class ImageCanvasUseCase {
+      constructor(canvasId) {
+        this.canvas = document.getElementById(canvasId);
+        this.context = this.canvas.getContext('2d');
+        this.draggingImage = false;
+        this.dragStartX = 0;
+        this.dragStartY = 0;
+        this.image = null;
+      }
+
+      init() {
+        this.canvas.addEventListener('mousedown', this.handleMouseDown.bind(this));
+        this.canvas.addEventListener('mousemove', this.handleMouseMove.bind(this));
+        this.canvas.addEventListener('mouseup', this.handleMouseUp.bind(this));
+        this.canvas.addEventListener('drop', this.handleDrop.bind(this));
+        this.canvas.addEventListener('dragover', this.handleDragOver.bind(this));
+      }
+
+      handleMouseDown(e) {
+        this.dragStartX = e.pageX - this.canvas.offsetLeft;
+        this.dragStartY = e.pageY - this.canvas.offsetTop;
+        if (this.image && this.isMouseOverImage(this.dragStartX, this.dragStartY)) {
+          this.draggingImage = true;
+        }
+      }
+
+      handleMouseMove(e) {
+        if (this.draggingImage) {
+          const mouseX = e.pageX - this.canvas.offsetLeft;
+          const mouseY = e.pageY - this.canvas.offsetTop;
+          const deltaX = mouseX - this.dragStartX;
+          const deltaY = mouseY - this.dragStartY;
+          this.image.x += deltaX;
+          this.image.y += deltaY;
+          this.dragStartX = mouseX;
+          this.dragStartY = mouseY;
+          this.draw();
+        }
+      }
+
+      handleMouseUp() {
+        this.draggingImage = false;
+      }
+
+      handleDrop(e) {
+        e.preventDefault();
+        const file = e.dataTransfer.files[0];
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            const img = new Image();
+            img.onload = () => {
+              this.image = {
+                img,
+                x: e.clientX - 25,
+                y: e.clientY - 25,
+                width: 50,
+                height: 50
+              };
+              this.draw();
+            };
+            img.src = event.target.result;
+          };
+          reader.readAsDataURL(file);
+        }
+      }
+
+      handleDragOver(e) {
+        e.preventDefault();
+      }
+
+      isMouseOverImage(mouseX, mouseY) {
+        if (!this.image) return false;
+        return (
+          mouseX >= this.image.x &&
+          mouseX <= this.image.x + this.image.width &&
+          mouseY >= this.image.y &&
+          mouseY <= this.image.y + this.image.height
+        );
+      }
+
+      draw() {
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        if (this.image) {
+          this.context.drawImage(this.image.img, this.image.x, this.image.y, this.image.width, this.image.height);
+        }
+      }
+    }
+
+    // Caso de uso para inserção de texto no canvas
+    class TextCanvasUseCase {
+      constructor(canvasId) {
+        this.canvas = document.getElementById(canvasId);
+        this.context = this.canvas.getContext('2d');
+        this.isTyping = false;
+      }
+
+      init() {
+        this.canvas.addEventListener('click', this.handleClick.bind(this));
+        document.addEventListener('keydown', this.handleKeyDown.bind(this));
+      }
+
+      handleClick(e) {
+        if (!this.isTyping) {
+          const mouseX = e.pageX - this.canvas.offsetLeft;
+          const mouseY = e.pageY - this.canvas.offsetTop;
+          const text = prompt('Digite o texto:');
+          if (text !== null && text !== '') {
+            this.drawText(mouseX, mouseY, text);
+          }
+        }
+      }
+
+      handleKeyDown(e) {
+        if (e.key === 'Escape' && this.isTyping) {
+          this.isTyping = false;
+          this.canvas.focus();
+        }
+      }
+
+      drawText(x, y, text) {
+        this.context.font = '20px Arial';
+        this.context.fillStyle = 'black';
+        this.context.fillText(text, x, y);
+      }
+    }
+
+    // Inicialização dos casos de uso
+    const imageCanvasUseCase = new ImageCanvasUseCase('canvas');
+    imageCanvasUseCase.init();
+
+    const textCanvasUseCase = new TextCanvasUseCase('canvas');
+    textCanvasUseCase.init();
+
+  </script>
+</body>
+
+</html>

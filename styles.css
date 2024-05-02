@@ -1,0 +1,171 @@
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+  font-family: "Inter", sans-serif;
+
+}
+
+body {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 16px;
+}
+
+.wrapper-canvas {
+  width: 100%;
+  max-width: 1200px;
+  background-color: #ebf4fc;
+  border-radius: 28px;
+  position: relative;
+  height: 700px;
+  overflow: hidden;
+}
+
+.wrapper-canvas.droppable {
+  outline-width: 2px;
+  outline-style: dashed;
+  outline-color: #d8e1e8;
+}
+
+.wrapper-canvas canvas{
+  width: 100%;
+  height: 100%;
+}
+
+.wrapper-canvas:hover .menu {
+  opacity: 1;
+}
+
+.wrapper-canvas .menu {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  gap: 10px;
+  list-style: none;
+  padding: 10px 32px;
+  background-color: white;
+  border-radius: 0 0 0 12px;
+  opacity: 0;
+  transition: 0.3s;
+  font-size: 14px;
+}
+
+.editor-input {
+  position: absolute;
+  background-color: transparent;
+  border-radius: 4px;
+  border: none;
+  width: fit-content;
+}
+
+.editor-input:focus {
+ outline-color: black;
+}
+
+.menu-drops {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background-color: white;
+  padding: 12px;
+  border-radius: 22px;
+  transition: all 0.3s;
+  width: 56px;
+  height: 56px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.menu-drops.active  {
+  width: 300px;
+  height: calc(100% - 32px);
+  gap: 20px;
+}
+
+.menu-trigger{
+  padding: 4px;
+  font-size: 24px;
+  line-height: 1;
+  border: none;
+  background-color: transparent;
+  height: 32px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.menu-trigger span {
+  font-size: 16px;
+  font-weight: 500;
+  opacity: 0;
+  transition-delay: 0.15s;
+  transition: 0.3s;
+}
+
+.menu-drops.active .menu-trigger span {
+  opacity: 1;
+}
+
+.menu-content {
+  transition: 0.3s;
+  transition-delay: .3s;
+  opacity: 0;
+  gap: 28px;
+  display: flex;
+  flex-direction: column;
+}
+
+.menu-drops.active .menu-content{
+  opacity: 1;
+}
+
+.item-menu {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 12px;
+  background-color: #f3f9ff;
+  border: #dfe7ef 1px solid;
+  border-radius: 12px;
+  font-size: 14px;
+  user-select: none;
+  cursor: move;
+}
+
+.item-menu i {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.section-menu{
+  display: flex;
+  flex-direction: column;
+  padding: 6px;
+  border-radius: 16px;
+  background-color: #e1f1ff;
+  gap: 6px;
+  padding-top: 20px;
+}
+
+.section-menu h3{
+  margin-bottom: 8px;
+  font-size: 16px;
+  padding: 0 12px;
+  font-weight: 500;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.file-picker {
+  opacity: 0;
+  visibility: hidden;
+  width: 0;
+}

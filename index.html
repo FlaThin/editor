@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <title>Document</title>
+</head>
+
+<body>
+  <div class="wrapper-canvas">
+    <canvas id="canvas"></canvas>
+    
+    <div class="menu-drops">
+      <button class="menu-trigger">
+        <i class="ph ph-arrows-out-cardinal"></i>
+        <span>Editor</span>
+        <!-- <i class="ph ph-arrows-out"></i> -->
+      </button>
+
+      <div class="menu-content">
+        <section class="section-menu">
+          <h3>Time visitante</h3>
+          <div class="item-menu">
+            <!-- <i class="ph ph-shield"></i> -->
+            <i class="ph ph-image-square"></i>
+            <span>Logo</span>
+          </div>
+          <div class="item-menu">
+            <i class="ph ph-coins"></i>
+            <span>Odd</span>
+          </div>
+        </section>
+        
+        <section class="section-menu">
+          <h3>
+            <span>Time da Casa</span>
+            <!-- <i class="ph ph-question"></i> -->
+          </h3>
+          <div class="item-menu">
+            <!-- <i class="ph ph-shield"></i> -->
+            <i class="ph ph-image-square"></i>
+            <span>Logo</span>
+          </div>
+          <div class="item-menu">
+            <i class="ph ph-coins"></i>
+            <span>Odd</span>
+          </div>
+        </section>
+        
+
+      </div>
+    </div>
+
+
+    <!-- <ul class="menu menu-trigger">
+      <li class="menu-trigger">
+        <span>Times</span>
+        <div class="menu-content">
+          <div class="item-menu">
+            <i class="ph ph-shield"></i>
+          </div>
+        </div>
+      </li>
+      <li>Odds</li>
+    </ul> -->
+  </div>
+  <input type="file" class="file-picker" id="file-picker">
+</body>
+<script>
+  const triggerEditor = document.querySelector(".menu-trigger");
+
+  triggerEditor.addEventListener("click", function () {
+    const menu = this.closest(".menu-drops");
+
+    menu.classList.contains("active") ? menu.classList.remove("active") : menu.classList.add("active");
+
+  })
+
+</script>
+
+<script src="main.js"></script>
+
+</html>

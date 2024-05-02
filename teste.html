@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arrastar e Redimensionar no Canvas</title>
+<style>
+    #canvas {
+        border: 1px solid black;
+    }
+</style>
+</head>
+<body>
+<canvas id="canvas" width="400" height="400"></canvas>
+
+<script>
+    window.onload = function() {
+        var canvas = document.getElementById('canvas');
+        var context = canvas.getContext('2d');
+
+        // Objeto representando o item redimensionável
+        var item = {
+            x: 100,
+            y: 100,
+            width: 100,
+            height: 100,
+            resizing: false,
+            resizeHandle: -1 // -1: não está redimensionando, 0-7: identificação do ponto de redimensionamento
+        };
+
+        // Função para desenhar o item no canvas
+        function drawItem() {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            context.fillStyle = 'blue';
+            context.fillRect(item.x, item.y, item.width, item.height);
+
+            // Desenhar manipuladores de redimensionamento em todos os lados
+            context.fillStyle = 'black';
+            context.fillRect(item.x - 4, item.y - 4, 8, 8); // superior esquerdo
+            context.fillRect(item.x + item.width - 4, item.y - 4, 8, 8); // superior direito
+            context.fillRect(item.x + item.width - 4, item.y + item.height - 4, 8, 8); // inferior direito
+            context.fillRect(item.x - 4, item.y + item.height - 4, 8, 8); // inferior esquerdo
+        }
+
+        // Função para verificar se o mouse está sobre um manipulador de redimensionamento
+        function isMouseOverResizeHandle(mouseX, mouseY) {
+            if (mouseX >= item.x - 4 && mouseX <= item.x + 4 &&
+                mouseY >= item.y - 4 && mouseY <= item.y + 4) {
+                return 0; // superior esquerdo
+            } else if (mouseX >= item.x + item.width - 4 && mouseX <= item.x + item.width + 4 &&
+                mouseY >= item.y - 4 && mouseY <= item.y + 4) {
+                return 1; // superior direito
+            } else if (mouseX >= item.x + item.width - 4 && mouseX <= item.x + item.width + 4 &&
+                mouseY >= item.y + item.height - 4 && mouseY <= item.y + item.height + 4) {
+                return 2; // inferior direito
+            } else if (mouseX >= item.x - 4 && mouseX <= item.x + 4 &&
+                mouseY >= item.y + item.height - 4 && mouseY <= item.y + item.height + 4) {
+                return 3; // inferior esquerdo
+            }
+            return -1;
+        }
+
+        // Evento de clique do mouse
+        canvas.addEventListener('mousedown', function(e) {
+            var mouseX = e.pageX - canvas.offsetLeft;
+            var mouseY = e.pageY - canvas.offsetTop;
+
+            item.resizeHandle = isMouseOverResizeHandle(mouseX, mouseY);
+            if (item.resizeHandle !== -1) {
+                item.resizing = true;
+            }
+        });
+
+        // Evento de soltar o clique do mouse
+        canvas.addEventListener('mouseup', function(e) {
+            item.resizing = false;
+        });
+
+        canvas.addEventListener('mousemove', function(e) {
+            if (item.resizing) {
+                var mouseX = e.pageX - canvas.offsetLeft;
+                var mouseY = e.pageY - canvas.offsetTop;
+
+                switch (item.resizeHandle) {
+                    case 0:
+                        item.width = item.x + item.width - mouseX;
+                        item.height = item.y + item.height - mouseY;
+                        item.x = mouseX;
+                        item.y = mouseY;
+                        break;
+                    case 1: 
+                        item.width = mouseX - item.x;
+                        item.height = item.y + item.height - mouseY;
+                        item.y = mouseY;
+                        break;
+                    case 2: 
+                        item.width = mouseX - item.x;
+                        item.height = mouseY - item.y;
+                        break;
+                    case 3: 
+                        item.width = item.x + item.width - mouseX;
+                        item.height = mouseY - item.y;
+                        item.x = mouseX;
+                        break;
+                }
+
+                drawItem();
+            }
+        });
+
+        // Desenhar o item inicialmente
+        drawItem();
+    };
+</script>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Elemento Dragável</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<style>
+  body {
+    background-color: #3d3d3d;
+  }
+
+  .draggable {
+    width: 100px;
+    height: 100px;
+    border: 2px solid #000;
+    cursor: move;
+    background-color: white;
+  }
+
+  .dragging {
+    opacity: 0.5;
+    /* Torna o elemento semi-transparente enquanto é arrastado */
+    pointer-events: none;
+    /* Evita que a pré-visualização interfira com o arrastar */
+  }
+</style>
+
+<body>
+
+  <div id="dragContainer">
+    <div class="draggable">
+      <!-- <img src="elemento1.png" alt="Elemento 1" /> -->
+      <h2>Elemento</h2>
+
+    </div>
+    <div class="draggable">
+      <!-- <img src="elemento2.png" alt="Elemento 2" /> -->
+      <h2>Elemento</h2>
+
+    </div>
+    <div class="draggable">
+      <!-- <img src="elemento3.png" alt="Elemento 3" /> -->
+      <h2>Elemento</h2>
+    </div>
+  </div>
+
+
+  <script>
+    var MinhaLib = (function () {
+      // Função para tornar os elementos arrastáveis dentro de um contêiner
+      function tornarArrastavel(contenedor) {
+        var elementosArrastaveis = contenedor.querySelectorAll('.draggable');
+        var elementoArrastavelAtual;
+
+        elementosArrastaveis.forEach(function (elemento) {
+          elemento.draggable = true;
+
+          elemento.addEventListener('dragstart', function (event) {
+            // Guarda o elemento arrastável atual
+            elementoArrastavelAtual = elemento;
+
+            // Cria a pré-visualização do elemento
+            // var preview = elemento.cloneNode(true);
+            // preview.classList.add('preview');
+            // document.body.appendChild(preview);
+
+            // // Posiciona a pré-visualização na posição do cursor
+            // preview.style.position = 'absolute';
+            // preview.style.left = (event.clientX - 50) + 'px';
+            // preview.style.top = (event.clientY - 50) + 'px';
+          });
+
+          elemento.addEventListener('dragend', function () {
+            // Remove a pré-visualização ao finalizar o arrasto
+            var previews = document.getElementsByClassName('preview');
+            for (var i = 0; i < previews.length; i++) {
+              previews[i].remove();
+            }
+          });
+        });
+      }
+
+      // Retorna as funções que queremos tornar públicas
+      return {
+        tornarArrastavel: tornarArrastavel
+      };
+    })();
+
+    MinhaLib.tornarArrastavel(document.getElementById('dragContainer'));
+  </script>
+</body>
+
+</html>
