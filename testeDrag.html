@@ -1,97 +1,169 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Elemento Dragável</title>
-  <link rel="stylesheet" href="styles.css">
-</head>
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Drag and Resize on Canvas</title>
 <style>
-  body {
-    background-color: #3d3d3d;
-  }
-
-  .draggable {
-    width: 100px;
-    height: 100px;
-    border: 2px solid #000;
-    cursor: move;
-    background-color: white;
-  }
-
-  .dragging {
-    opacity: 0.5;
-    /* Torna o elemento semi-transparente enquanto é arrastado */
-    pointer-events: none;
-    /* Evita que a pré-visualização interfira com o arrastar */
-  }
+    #canvas {
+        border: 1px solid black;
+    }
 </style>
-
+</head>
 <body>
+<canvas id="canvas" width="800" height="600"></canvas>
 
-  <div id="dragContainer">
-    <div class="draggable">
-      <!-- <img src="elemento1.png" alt="Elemento 1" /> -->
-      <h2>Elemento</h2>
+<script>
+    window.onload = function() {
+        var canvas = document.getElementById('canvas');
+        var context = canvas.getContext('2d');
 
-    </div>
-    <div class="draggable">
-      <!-- <img src="elemento2.png" alt="Elemento 2" /> -->
-      <h2>Elemento</h2>
+        var items = []; // Array to store items
+        var currentItem = null; // Variable to track the current selected item
 
-    </div>
-    <div class="draggable">
-      <!-- <img src="elemento3.png" alt="Elemento 3" /> -->
-      <h2>Elemento</h2>
-    </div>
-  </div>
+        // Function to draw all items on the canvas
+        function drawItems() {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            items.forEach(function(item) {
+                context.drawImage(item.image, item.x, item.y, item.width, item.height);
+                if (item === currentItem) {
+                    // Draw resize handles only if the item is selected
+                    context.fillStyle = 'black';
+                    context.fillRect(item.x - 4, item.y - 4, 8, 8); // top left
+                    context.fillRect(item.x + item.width - 4, item.y - 4, 8, 8); // top right
+                    context.fillRect(item.x + item.width - 4, item.y + item.height - 4, 8, 8); // bottom right
+                    context.fillRect(item.x - 4, item.y + item.height - 4, 8, 8); // bottom left
+                }
+            });
+        }
 
-
-  <script>
-    var MinhaLib = (function () {
-      // Função para tornar os elementos arrastáveis dentro de um contêiner
-      function tornarArrastavel(contenedor) {
-        var elementosArrastaveis = contenedor.querySelectorAll('.draggable');
-        var elementoArrastavelAtual;
-
-        elementosArrastaveis.forEach(function (elemento) {
-          elemento.draggable = true;
-
-          elemento.addEventListener('dragstart', function (event) {
-            // Guarda o elemento arrastável atual
-            elementoArrastavelAtual = elemento;
-
-            // Cria a pré-visualização do elemento
-            // var preview = elemento.cloneNode(true);
-            // preview.classList.add('preview');
-            // document.body.appendChild(preview);
-
-            // // Posiciona a pré-visualização na posição do cursor
-            // preview.style.position = 'absolute';
-            // preview.style.left = (event.clientX - 50) + 'px';
-            // preview.style.top = (event.clientY - 50) + 'px';
-          });
-
-          elemento.addEventListener('dragend', function () {
-            // Remove a pré-visualização ao finalizar o arrasto
-            var previews = document.getElementsByClassName('preview');
-            for (var i = 0; i < previews.length; i++) {
-              previews[i].remove();
+        // Function to check if the mouse is over a resize handle
+        function isMouseOverResizeHandle(item, mouseX, mouseY) {
+            if (mouseX >= item.x - 4 && mouseX <= item.x + 4 &&
+                mouseY >= item.y - 4 && mouseY <= item.y + 4) {
+                return 0; // top left
+            } else if (mouseX >= item.x + item.width - 4 && mouseX <= item.x + item.width + 4 &&
+                mouseY >= item.y - 4 && mouseY <= item.y + 4) {
+                return 1; // top right
+            } else if (mouseX >= item.x + item.width - 4 && mouseX <= item.x + item.width + 4 &&
+                mouseY >= item.y + item.height - 4 && mouseY <= item.y + item.height + 4) {
+                return 2; // bottom right
+            } else if (mouseX >= item.x - 4 && mouseX <= item.x + 4 &&
+                mouseY >= item.y + item.height - 4 && mouseY <= item.y + item.height + 4) {
+                return 3; // bottom left
             }
-          });
+            return -1;
+        }
+
+        // Function to load an image and create an item
+        function loadImageAndCreateItem(imageSrc, x, y, width, height) {
+            var img = new Image();
+            img.onload = function() {
+                var item = {
+                    image: img,
+                    x: x,
+                    y: y,
+                    width: width,
+                    height: height,
+                    resizing: false,
+                    dragging: false,
+                    resizeHandle: -1
+                };
+                items.push(item);
+                drawItems();
+            };
+            img.src = imageSrc;
+        }
+
+        // Mouse down event
+        canvas.addEventListener('mousedown', function(e) {
+            var mouseX = e.pageX - canvas.offsetLeft;
+            var mouseY = e.pageY - canvas.offsetTop;
+
+            currentItem = null;
+
+            for (var i = items.length - 1; i >= 0; i--) {
+                var item = items[i];
+                var resizeHandle = isMouseOverResizeHandle(item, mouseX, mouseY);
+                if (resizeHandle !== -1) {
+                    item.resizing = true;
+                    item.resizeHandle = resizeHandle;
+                    currentItem = item;
+                    break;
+                } else if (mouseX >= item.x && mouseX <= item.x + item.width &&
+                    mouseY >= item.y && mouseY <= item.y + item.height) {
+                    item.dragging = true;
+                    currentItem = item;
+                    break;
+                }
+            }
+
+            drawItems();
         });
-      }
 
-      // Retorna as funções que queremos tornar públicas
-      return {
-        tornarArrastavel: tornarArrastavel
-      };
-    })();
+        // Mouse up event
+        canvas.addEventListener('mouseup', function(e) {
+            if (currentItem) {
+                currentItem.resizing = false;
+                currentItem.dragging = false;
+            }
+            currentItem = null;
+        });
 
-    MinhaLib.tornarArrastavel(document.getElementById('dragContainer'));
-  </script>
+        // Mouse move event
+        canvas.addEventListener('mousemove', function(e) {
+            var mouseX = e.pageX - canvas.offsetLeft;
+            var mouseY = e.pageY - canvas.offsetTop;
+
+            if (currentItem) {
+                if (currentItem.resizing) {
+                    switch (currentItem.resizeHandle) {
+                        case 0:
+                            currentItem.width = currentItem.x + currentItem.width - mouseX;
+                            currentItem.height = currentItem.y + currentItem.height - mouseY;
+                            currentItem.x = mouseX;
+                            currentItem.y = mouseY;
+                            break;
+                        case 1:
+                            currentItem.width = mouseX - currentItem.x;
+                            currentItem.height = currentItem.y + currentItem.height - mouseY;
+                            currentItem.y = mouseY;
+                            break;
+                        case 2:
+                            currentItem.width = mouseX - currentItem.x;
+                            currentItem.height = mouseY - currentItem.y;
+                            break;
+                        case 3:
+                            currentItem.width = currentItem.x + currentItem.width - mouseX;
+                            currentItem.height = mouseY - currentItem.y;
+                            currentItem.x = mouseX;
+                            break;
+                    }
+                } else if (currentItem.dragging) {
+                    currentItem.x = mouseX;
+                    currentItem.y = mouseY;
+                }
+                drawItems();
+            }
+        });
+
+        // Key down event to handle delete key press
+        window.addEventListener('keydown', function(e) {
+            if (currentItem && e.key === 'Delete') {
+                console.log(currentItem)
+                var index = items.indexOf(currentItem);
+                if (index !== -1) {
+                    items.splice(index, 1);
+                    currentItem = null;
+                    drawItems();
+                }
+            }
+        });
+
+        // Load images and create items
+        loadImageAndCreateItem('logo.png', 100, 100, 100, 100);
+        loadImageAndCreateItem('logo.png', 300, 300, 150, 150);
+    };
+</script>
 </body>
-
 </html>
